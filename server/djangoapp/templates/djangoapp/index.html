@@ -17,9 +17,125 @@
     <!-- Remove this line the first time you edit this file -->
      This is the index page of your Django app!
     <!--Add a nav bar here -->
+    <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                    <a class="navbar-brand" href="{% url 'djangoapp:index' %}">Dealership Review</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="text" href="{% url 'djangoapp:about' %}">About Us</a>
+                    <a class="text" href="{% url 'djangoapp:contact' %}">Contact Us</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if user.is_authenticated %}
+                <li>
+                    <a class="btn btn-link" href ="#">{{ user.first_name }}({{ user.username }})</a>
+                    <a class="btn btn-link" href ="{% url 'djangoapp:logout' %}">Logout</a>
+                </li>
+                {% else %}
+                <li>
+                    <form class="form-inline" action="{% url 'djangoapp:login' %}" method = "post">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <input type="test" class="form-control" placeholder="Username" name="username" >
+                                        <input type="password" class="form-control" placeholder="Password" name="psw" >
+                                    </td>
+                                    <td rowspan="2">
+                                        <button class="btn btn-primary" type="submit">Login</a>
+                                    </td>
+                                    <td rowspan="2">
+                                        <a class="btn" href="{% url 'djangoapp:registration' %}">Signup</a>
+                                    </td>
+                                </tr>
+                                {% if message %}
+                                <tr><td>
+                                    <div class="alert alert-warning"> <!--Stylize the message paragraph with .alert and .alert-warning class -->
+                                    {{ message }}
+                                    </div>
+                                </td></tr>
+                                {% endif %}
+                            </table>
+                        </div>
+    
+                    </form>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
 
     <!--Add a dealer table here -->
+    {% load static %}
+
+<table class="table" id="table" data-filter-control="true">
+    <thead>
+        <tr>
+            <th data-field="id">ID</th>
+            <th data-field="name">Dealer Name</th>
+            <th data-field="city">City</th>
+            <th data-field="address">Address</th>
+            <th data-field="zip">Zip</th>
+            <th data-field="state" data-filter-control="select">State</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dealer in dealer_list %}
+            <tr>
+                <td>{{dealer.id}}</td>
+                <td><a href="{% url 'djangoapp:dealer_details' dealer.id %}">
+                    {{dealer.full_name}}
+                </a>
+                </td>
+                <td>{{dealer.city}}</td>
+                <td>{{dealer.address}}</td>
+                <td>{{dealer.zip}}</td>
+                <td>{{dealer.st}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if dealer_list %}
+    <!-- <ul>
+    {% for dealer in dealer_list %}
+        <div>
+            <h1><b>{{ dealer.short_name }}</b></h1>
+            {{ dealer.id }} {{ dealer.full_name }} <br>
+            {{ dealer.address }} <br>
+            {{ dealer.city }}, {{ dealer.st }} {{ dealer.zip }}
+        </div>
+    {% endfor %}
+    </ul> -->
+{% else %}
+<p>No dealers are available.</p>
+{% endif %}
+
+{% if review_list %}
+    <ul>
+    {% for review in review_list %}
+        <div>
+            <h2>{{ review.dealership }}</h2>
+            {{ review.id }} {{ review.name }} <br>
+            {{ review.review }} ({{ review.sentiment }})<br>
+            {{ review.purchase }} {{ review.purchase_date }} <br>
+            {{ review.car_make }}, {{ review.car_model }} {{ review.car_year }}
+        </div>
+    {% endfor %}
+    </ul>
+{% else %}
+<!-- <p>No reviews are available.</p> -->
+{% endif %}
 
     </body>
+    <script>
+        $(function() {
+          $('#table').bootstrapTable()
+        })
+    </script>
 
 </html>
